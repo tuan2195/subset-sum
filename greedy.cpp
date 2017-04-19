@@ -9,13 +9,13 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        std::cout << "Usage: ./naive <sampleSet> <target>" << std::endl;
+        std::cout << "Usage: ./greedy <sampleSet> <target>" << std::endl;
         exit(1);
     }
 
     // Open file to read from
     std::ifstream input (argv[1], std::ios::in);
-    auto target = std::stoull(argv[2]);
+    auto target = std::stoll(argv[2]);
 
     if (!input)
     {
@@ -35,44 +35,44 @@ int main(int argc, char** argv)
     // Seuquential solver using binary representation
     // to generate and represents different combinations
     // Size must be less than 64 otherwise will overflow
-    auto size = sample.size();
-    if (size > 63)
-    {
-        std::cout << "Naive solver only support less than 64 elements!" << std::endl;
-        exit(1);
-    }
-    auto numOfCombinations = 1ULL<<size;
+    //auto size = sample.size();
 
-    std::cout << "Sample size: " << size << std::endl;
-    std::cout << "Num of sets: " << numOfCombinations << std::endl;
-    std::cout << "Target sums: " << target << std::endl;
+    //std::cout << "Sample size: " << size << std::endl;
+    //std::cout << "Target sums: " << target << std::endl;
 
     auto start = std::chrono::steady_clock::now();
+    std::sort(sample.begin(), sample.end(), std::greater<long>());
 
-    for (auto i = 0ULL; i < numOfCombinations; ++i)
+    auto sum = 0LL;
+    std::vector<long> result;
+
+    for (const auto &x: sample)
     {
-        auto sum = 0ULL;
-        for (auto j = 0U; j < size; ++j)
+        if (sum < target && x < target - sum)
         {
-            // If bit j-th is 1 then the element is in
-            // this combination, otherwise it is not
-            if (i & (1ULL<<j))
-            {
-                sum += sample[j];
-            }
-        }
-
-        if (sum == target)
-        {
-            std::cout << "FOUND!" << std::endl;
-            break;
+            sum += x;
+            result.push_back(x);
         }
     }
 
     auto end = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
 
-    std::cout << "Time taken: " << elapsed.count() << " us" << std::endl;
+    //std::cout << "Sorted sample: ";
+    //for (const auto &x : sample)
+        //std::cout << x << " ";
+    //std::cout << std::endl;
+
+    //std::cout << "Result: ";
+    //for (const auto &x : result)
+        //std::cout << x << " ";
+    //std::cout << std::endl;
+
+    //std::cout << "Sum: " << sum << std::endl;
+    //std::cout << "Diff: " << target - sum << std::endl;
+
+    //std::cout << "Time taken: " << elapsed.count() << " us" << std::endl;
+    std::cout << elapsed.count() << std::endl;
 
     return 0;
 }
